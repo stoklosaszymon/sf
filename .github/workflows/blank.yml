@@ -11,10 +11,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Instal Node   
+        uses: actions/setup-node@v4
+        with:
+            node-version: 18
 
       - name: Install Salesforce CLI
-        uses: amtrack/sfdx-actions/setup-sfdx@v1
+        run: |
+          npm install @salesforce/cli
 
       - name: Authenticate with Salesforce (JWT)
         run: |
