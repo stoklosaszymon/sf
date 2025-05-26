@@ -1,0 +1,30 @@
+name: Validate Salesforce Metadata on PR
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  validate-metadata:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Salesforce CLI
+        uses: amtrack/sfdx-actions/setup-sfdx@v1
+
+      - name: Authenticate with Salesforce (JWT)
+        run: |
+          echo "${{ secrets.SALESFORCE_JWT_KEY }}" > server.key
+          sfdx auth:jwt:grant --clientid ${{ secrets.SALESFORCE_CLIENT_ID }} \
+            --jwtkeyfile server.key \
+            --username ${{ secrets.SALESFORCE_USERNAME }} \
+            --instanceurl https://test.salesforce.com \
+            --setalias ci-org
+
+      - name: Validate Deployment
+        run: |
+          sfdx force:source:deploy -p force-app --targetusername ci-org --checkonly --testlevel RunLocalTests
