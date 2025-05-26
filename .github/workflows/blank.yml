@@ -2,8 +2,7 @@ name: Validate Salesforce Metadata on PR
 
 on:
   pull_request:
-    branches:
-      - dev
+    branches: [ "dev" ]
 
 jobs:
   validate-metadata:
