@@ -6,31 +6,41 @@ on:
       - dev
 
 jobs:
-  validate-metadata:
+  validate-deployment:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Instal Node   
+      - name: Instal Node
         uses: actions/setup-node@v4
         with:
             node-version: 18
 
       - name: Install Salesforce CLI
         run: |
-          npm install @salesforce/cli
-
-      - name: Authenticate with Salesforce (JWT)
+          npm install -g @salesforce/cli
+      
+      - name: Set up JWT Private Key
         run: |
           echo "${{ secrets.SALESFORCE_JWT_KEY }}" > server.key
-          sfdx auth:jwt:grant --clientid ${{ secrets.SALESFORCE_CLIENT_ID }} \
-            --jwtkeyfile server.key \
-            --username ${{ secrets.SALESFORCE_USERNAME }} \
-            --instanceurl https://test.salesforce.com \
-            --setalias ci-org
+          chmod 600 server.key
+        shell: bash
 
-      - name: Validate Deployment
+      - name: Authenticate to Salesforce Org via JWT
         run: |
-          sfdx force:source:deploy -p force-app --targetusername ci-org --checkonly --testlevel RunLocalTests
+          sf org login jwt \
+            --client-id ${{ secrets.SALESFORCE_CLIENT_ID }} \
+            --jwt-key-file server.key \
+            --username ${{ secrets.SALESFORCE_USERNAME }} \
+            --set-default-dev-hub \
+            --alias ci-org
+        shell: bash
+
+      - name: Validate Salesforce Metadata Deployment
+        run: |
+          sf project deploy validate \
+            --source-dir force-app \
+            --target-org ci-org \
+            --test-level RunLocalTests # Required for validate deployments
+        shell: bash
