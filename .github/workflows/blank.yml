@@ -6,7 +6,6 @@ on:
       - dev
 
 jobs:
- jobs:
   validate-deployment:
     runs-on: ubuntu-latest
     steps:
