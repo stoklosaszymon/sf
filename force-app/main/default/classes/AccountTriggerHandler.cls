@@ -8,6 +8,10 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         this.updateDescription(Trigger.new, oldMap);
     }
 
+    protected override void handleBeforeUpdate() {
+        this.updatePhoneNumber(Trigger.new);
+    }
+
     private void setIndustry(List<Account> accounts) {
         for (Account account : accounts) {
             if (account.Name != null && account.Name.toLowerCase().contains('tech')) {
@@ -33,6 +37,14 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
 
         if (!accountsToUpdate.isEmpty()) {
             update accountsToUpdate;
+        }
+    }
+
+    private void updatePhoneNumber(List<Account> accounts) {
+        for (Account account : accounts) {
+            if (String.isBlank(account.Phone)) {
+                account.Phone = '000-000-000';
+            }
         }
     }
 }
