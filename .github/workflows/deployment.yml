@@ -30,9 +30,9 @@ jobs:
       - name: Authenticate to Salesforce Production Org via JWT
         run: |
           sf org login jwt \
-            --client-id ${{ secrets.SALESFORCE_PROD_CLIENT_ID }} \
+            --client-id ${{ secrets.SALESFORCE_CLIENT_ID }} \
             --jwt-key-file server.key \
-            --username ${{ secrets.SALESFORCE_PROD_USERNAME }} \
+            --username ${{ secrets.SALESFORCE_USERNAME }} \
             --set-default-dev-hub \
             --alias prod-org # Alias for your production/target org
         shell: bash
