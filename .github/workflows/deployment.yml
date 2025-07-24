@@ -42,6 +42,6 @@ jobs:
           sf project deploy start \
             --source-dir force-app \
             --target-org prod-org \
-            --wait 10 # Waits for the deployment to complete (adjust as needed)
+            --wait 10 \
             --test-level RunLocalTests
         shell: bash
