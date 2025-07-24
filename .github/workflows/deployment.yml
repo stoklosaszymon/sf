@@ -1,0 +1,47 @@
+name: Deploy Salesforce Metadata on Merge to Main
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy-to-production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Salesforce CLI
+        run: |
+          npm install -g @salesforce/cli
+
+      - name: Set up JWT Private Key
+        run: |
+          echo "${{ secrets.SALESFORCE_JWT_KEY }}" > server.key 
+          chmod 600 server.key
+        shell: bash
+
+      - name: Authenticate to Salesforce Production Org via JWT
+        run: |
+          sf org login jwt \
+            --client-id ${{ secrets.SALESFORCE_PROD_CLIENT_ID }} \
+            --jwt-key-file server.key \
+            --username ${{ secrets.SALESFORCE_PROD_USERNAME }} \
+            --set-default-dev-hub \
+            --alias prod-org # Alias for your production/target org
+        shell: bash
+
+      - name: Deploy Salesforce Metadata
+        run: |
+          sf project deploy start \
+            --source-dir force-app \
+            --target-org prod-org \
+            --wait 10 # Waits for the deployment to complete (adjust as needed)
+            --test-level RunLocalTests 
+        shell: bash
