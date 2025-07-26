@@ -4,7 +4,7 @@ private class UpdateLastLoginTrackedJobTest {
     static void userLastLoginTrackedShouldRun() {
         Profile p = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
         User u = new User(
-            Username = 'loginuser@test.com',
+            Username = 'loginuser_xxx123@test_myscratch.com',
             LastName = 'Login',
             Email = 'login@test.com',
             Alias = 'login',
