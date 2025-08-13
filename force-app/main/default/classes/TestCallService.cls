@@ -10,27 +10,27 @@ public class TestCallService {
         }
     }
 
-    public static void createPostExample() {
-        String url = 'https://jsonplaceholder.typicode.com/posts';
+    public static Map<String, Object> createPost(String title, String body, Integer userId) {
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint('https://jsonplaceholder.typicode.com/posts');
+        req.setMethod('POST');
+        req.setHeader('Content-Type', 'application/json');
 
-        Map<String, Object> postData = new Map<String, Object>{
-            'title' => 'Test Title',
-            'body' => 'This is the body of the post.',
-            'userId' => 101
+        Map<String, Object> payload = new Map<String, Object>{
+            'title' => title,
+            'body' => body,
+            'userId' => userId
         };
 
-        String body = JSON.serialize(postData);
+        req.setBody(JSON.serialize(payload));
 
-        Map<String, String> headers = new Map<String, String>{
-            'Content-Type' => 'application/json'
-        };
+        Http http = new Http();
+        HttpResponse res = http.send(req);
 
-        HttpResponse response = HttpService.sendRequest('POST', url, body, headers);
-
-        if (response.getStatusCode() == 201) {
-            System.debug('POST Success: ' + response.getBody());
+        if (res.getStatusCode() == 201) {
+            return (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
         } else {
-            System.debug('POST Error: ' + response.getStatusCode());
+            throw new CalloutException('Failed to create post. Status: ' + res.getStatusCode());
         }
     }
 }
